@@ -248,12 +248,52 @@ class Inform7Game:
 
         return type_defs + type_desc
 
+    def gen_cog_sci_properties(self) -> str:
+        # TODO: define new properties
+        properties = ""
+        # properties += "object-like is either beencut or uncut\n"
+        # properties += "object-like is usually uncut.\n"
+        # properties += "object-like is either cuttable or not cuttable.\n"
+        properties += textwrap.dedent("""\
+        object-like is either beencut or uncut.
+        object-like is usually uncut.
+        object-like is either cuttable or not cuttable.
+        """)
+
+        return properties
+
+    def gen_cog_sci_actions(self) -> str:
+        actions = ""
+
+        # CUT
+        actions += textwrap.dedent("""\
+        The block cutting rule is not listed in the check cutting rulebook.
+        carry out cutting:
+            say "You just cut the [noun].";
+            now the noun is beencut;
+        
+        [assuming a knife has been included.]
+        check cutting:
+            if the noun is not a food:
+                say "You cannot cut this." instead;
+            else if the noun is beencut:
+                say "You already cut the [noun]." instead;
+            else if the player does not have the knife:
+                say "You need a knife to cut something. instead;
+        """)
+
+        return actions
+
     def gen_source(self, seed: int = 1234) -> str:
         source = ""
         source += "When play begins, seed the random-number generator with {}.\n\n".format(seed)
         source += self.define_inform7_kinds()
         # Mention that rooms have a special text attribute called 'internal name'.
         source += "A room has a text called internal name.\n\n"
+
+        # TODO: add function for defining new properties
+        # might just be able to use the inform7_addons_code?
+        source += self.gen_cog_sci_properties() + "\n"
 
         # Define custom addons.
         source += self.kb.inform7_addons_code + "\n"
@@ -283,6 +323,9 @@ class Inform7Game:
         source += "\n"
         source += self.gen_source_for_objects(self.game.world.objects)
         source += "\n\n"
+        
+        # Declare cog sci actions
+        source += self.gen_cog_sci_actions() + "\n" 
 
         # Place the player.
         source += "The player is in {}.\n\n".format(self.entity_infos[self.game.world.player_room.id].id)
