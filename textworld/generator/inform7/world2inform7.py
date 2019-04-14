@@ -284,32 +284,39 @@ class Inform7Game:
 
         return properties
 
-    def gen_cog_sci_actions(self) -> str:
+    def gen_cog_sci_actions(self, objects: Iterable[WorldEntity]) -> str:
+        obj_names = {}
+        
+        for obj in objects:
+            if obj.type in ["P", "I"]:
+                continue
+            obj_infos = self.entity_infos[obj.id]
+            obj_names[obj_infos.name] = obj_infos.id
+        
         actions = ""
-
-        # CUT
-        actions += textwrap.dedent("""\
+        
+        # CUT 
+        cut_string = textwrap.dedent("""\
         The block cutting rule is not listed in the check cutting rulebook.
         carry out cutting:
             say "You just cut the [noun].";
             now the noun is beencut;
         
-        """)
-
-        actions += textwrap.dedent("""\
-        [assuming a knife has been included]
         check cutting:
             if the noun is not a food:
                 say "You cannot cut this." instead;
             else if the noun is beencut:
                 say "You already cut the [noun]." instead;
-            [else if the player does not hold the knife:
-                say "You need a knife to cut something." instead;]
+            else if the player does not hold {}:
+                say "You need a knife to cut something." instead;
+            else if the player does not have the noun:
+                say "You need to get the [noun] first." instead;
         
-        """)
+        """) # .format(obj_names['knife'])
+        actions += cut_string.format(obj_names['knife'])
 
         # PEEL
-        actions += textwrap.dedent("""\
+        peel_string = textwrap.dedent("""\
         Understand "peel [something]" as peeling.
         Peeling is an action applying to one thing.
         
@@ -321,12 +328,18 @@ class Inform7Game:
                 say "You cannot peel that." instead;
             else if the noun is peeled:
                 say "The [noun] is already peeled." instead;
+            else if the player does not hold {}:
+                say "You need a peeler to peel something." instead;
+            else if the player does not have the noun:
+                say "You need to get the [noun] first." instead;
         
         """)
+        actions += peel_string.format(obj_names['peeler'])
 
         # MIX
-        actions += textwrap.dedent("""\
-        Understand "mix [something]" as mixing.
+        # actions += textwrap.dedent("""\
+        mix_string = textwrap.dedent("""\
+        Understand "mix [things]" as mixing.
         Mixing is an action applying to things.
         
         carry out mixing:
@@ -338,8 +351,13 @@ class Inform7Game:
                 say "You cannot mix that." instead;
             else if the noun is mixed:
                 say "The [noun] is already mixed." instead;
+            else if the player does not hold {}:
+                say "You need a spoon to mix something." instead;
+            else if the player does not have the noun:
+                say "You need to get the [noun] first." instead;
         
         """)
+        actions += mix_string.format(obj_names['spoon'])
 
         return actions
 
@@ -384,7 +402,7 @@ class Inform7Game:
         source += "\n\n"
         
         # Declare cog sci actions
-        source += self.gen_cog_sci_actions() + "\n" 
+        source += self.gen_cog_sci_actions(self.game.world.objects) + "\n" 
 
         # Place the player.
         source += "The player is in {}.\n\n".format(self.entity_infos[self.game.world.player_room.id].id)
@@ -830,6 +848,9 @@ class Inform7Game:
             say "  insert ... into ...: place an object into a container[line break]";
             say "  lock ... with ...:   lock a door or a container with a key[line break]";
             say "  unlock ... with ...: unlock a door or a container with a key[line break]";
+            say "  cut ...:             cut food with a knife[line break]";
+            say "  mix ...:             mix food with a spoon[line break]";
+            say "  peel ...:            peel food with a peeler[line break]";
 
         Understand "help" as displaying help message.
 
