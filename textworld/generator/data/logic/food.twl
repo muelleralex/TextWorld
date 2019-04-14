@@ -4,11 +4,15 @@ type f : o {
         edible(f);
         eaten(f);
         beencut(f);
+        peeled(f);
+        mixed(f);
     }
 
     rules {
         eat :: in(f, I) -> eaten(f);
         cut :: in(f, I) -> beencut(f);
+        peel :: in(f, I) -> peeled(f);
+        mix :: in(f, I) -> mixed(f);
     }
 
     reverse_rules {
@@ -32,11 +36,15 @@ type f : o {
             edible(f) :: "The {f} is edible";
             eaten(f) :: "The {f} is nowhere";
             beencut(f) :: "The {f} is beencut";
+            peeled(f) :: "The {f} is peeled";
+            mixed(f) :: "The {f} is mixed";
         }
 
         commands {
             eat :: "eat {f}" :: "eating the {f}";
             cut :: "cut {f}" :: "cutting the {f}";
+            peel :: "peel {f}" :: "peeling the {f}";
+            mix :: "mix {f}" :: "mixing the {f}";
         }
     }
 }

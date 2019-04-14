@@ -261,6 +261,7 @@ class Inform7Game:
         object-like is usually uncut.
         object-like is either cuttable or not cuttable.
         object-like is usually not cuttable.
+        food is usually cuttable.
         """)
 
         # PEEL properties
@@ -269,6 +270,16 @@ class Inform7Game:
         object-like is either peelable or unpeelable.
         object-like is usually unpeelable.
         object-like is usually unpeeled.
+        """)
+
+        # MIX properties
+        properties += textwrap.dedent("""
+        object-like is either mixed or unmixed.
+        object-like is either mixable or unmixable.
+        object-like is usually unmixable.
+        object-like is usually unmixed.
+        food is usually mixable.
+        food is usually unmixed.
         """)
 
         return properties
@@ -310,6 +321,23 @@ class Inform7Game:
                 say "You cannot peel that." instead;
             else if the noun is peeled:
                 say "The [noun] is already peeled." instead;
+        
+        """)
+
+        # MIX
+        actions += textwrap.dedent("""\
+        Understand "mix [something]" as mixing.
+        Mixing is an action applying to things.
+        
+        carry out mixing:
+            say "You just mixed the [noun].";
+            Now the noun is mixed.
+        
+        check mixing:
+            if the noun is unmixable:
+                say "You cannot mix that." instead;
+            else if the noun is mixed:
+                say "The [noun] is already mixed." instead;
         
         """)
 
