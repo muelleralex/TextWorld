@@ -254,10 +254,21 @@ class Inform7Game:
         # properties += "object-like is either beencut or uncut\n"
         # properties += "object-like is usually uncut.\n"
         # properties += "object-like is either cuttable or not cuttable.\n"
+        
+        # CUT properties
         properties += textwrap.dedent("""\
         object-like is either beencut or uncut.
         object-like is usually uncut.
         object-like is either cuttable or not cuttable.
+        object-like is usually not cuttable.
+        """)
+
+        # PEEL properties
+        properties += textwrap.dedent("""\
+        object-like is either peeled or unpeeled.
+        object-like is either peelable or unpeelable.
+        object-like is usually unpeelable.
+        object-like is usually unpeeled.
         """)
 
         return properties
@@ -271,6 +282,7 @@ class Inform7Game:
         carry out cutting:
             say "You just cut the [noun].";
             now the noun is beencut;
+        
         """)
 
         actions += textwrap.dedent("""\
@@ -282,6 +294,23 @@ class Inform7Game:
                 say "You already cut the [noun]." instead;
             [else if the player does not hold the knife:
                 say "You need a knife to cut something." instead;]
+        
+        """)
+
+        # PEEL
+        actions += textwrap.dedent("""\
+        Understand "peel [something]" as peeling.
+        Peeling is an action applying to one thing.
+        
+        carry out peeling:
+            say "You just peeled the [noun].";
+        
+        check peeling:
+            if the noun is unpeelable:
+                say "You cannot peel that." instead;
+            else if the noun is peeled:
+                say "The [noun] is already peeled." instead;
+        
         """)
 
         return actions
