@@ -272,9 +272,14 @@ class Inform7Game:
             say "You just cut the [noun].";
             now the noun is beencut;
         
+        [assuming a knife has been included.]
         check cutting:
-            if the noun is beencut:
+            if the noun is not a food:
+                say "You cannot cut this." instead;
+            else if the noun is beencut:
                 say "You already cut the [noun]." instead;
+            else if the player does not have the knife:
+                say "You need a knife to cut something. instead;
         """)
 
         return actions
